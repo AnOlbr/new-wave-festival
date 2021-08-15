@@ -18,6 +18,7 @@ class OrderTicketForm extends React.Component {
 
   updateSeat = (e, seatId) => {
     const { order } = this.state;
+    const { addSeat, loadSeats } = this.props;
 
     e.preventDefault();
     this.setState({ order: { ...order, seat: seatId }});
@@ -44,7 +45,7 @@ class OrderTicketForm extends React.Component {
     e.preventDefault();
 
     if(order.client && order.email && order.day && order.seat) {
-      addSeat(order);
+      await addSeat(order);
       this.setState({ 
         order: {
           client: '',
@@ -54,6 +55,7 @@ class OrderTicketForm extends React.Component {
         },
         isError: false,
       });
+      loadSeats();
     } else {
       this.setState({ isError: true });
     }
