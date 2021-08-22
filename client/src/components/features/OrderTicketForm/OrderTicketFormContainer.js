@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { addSeatRequest, getRequests } from '../../../redux/seatsRedux';
 import OrderTicketForm from './OrderTicketForm';
 import { addSeatRequest, getRequests, loadSeatsRequest } from '../../../redux/seatsRedux';
 
