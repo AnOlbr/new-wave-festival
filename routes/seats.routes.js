@@ -2,17 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
-
 const message = { message: 'OK' };
-
 router.route('/seats').get((req, res) => {
     res.json(db.seats);
 });
-
 router.route('/seats/:id').get((req, res) => {
     res.json(db.seats.filter(item => item.id == req.params.id));
 });
-
 router.route('/seats').post((req, res) => {
     const newItem = {
         id: uuidv4(),
@@ -21,8 +17,13 @@ router.route('/seats').post((req, res) => {
         client: req.body.client,
         email: req.body.email,
     };
-    db.seats.push(newItem);
-    res.json(message);
+    if (db.seats.some(item => item.seat === newItem.seat && item.day === newItem.day)) {
+        res.status(409).json({message: "The slot is already taken..."});
+    } else {
+        db.seats.push(newItem);
+        req.io.emit('seatsUpdated', db.seats);
+        res.json(message);
+    }
 });
 
 router.route('/seats/:id').put((req, res) => {
@@ -35,12 +36,8 @@ router.route('/seats/:id').put((req, res) => {
         client: req.body.client,
         email: req.body.email,
     });
-    if (db.seats.some(item => item.seat === newItem.seat && item.day === newItem.day)) {
-        res.status(409).json({message: "The slot is already taken..."});
-    } else {
-        db.seats.push(newItem);
-        res.json(message);
-    }
+    db.seats[index] = updateContent;
+    res.json(message);
 });
 
 router.route('/seats/:id').delete((req, res) => {
@@ -49,5 +46,4 @@ router.route('/seats/:id').delete((req, res) => {
     db.seats.splice(index, 1);
     res.json(message);
 });
-
 module.exports = router;
