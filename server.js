@@ -14,9 +14,17 @@ const server = app.listen(process.env.PORT || 8000, () => {
 });
 
 const io = socket(server, { cors: true });
-mongoose.connect('mongodb+srv://AnOlbr:AnOlbr2000@cluster0.js8l9.mongodb.net/NewWaveDB', {
+
+const dbURI =
+  process.env.NODE_ENV === "production"
+    ? "mongodb+srv://AnOlbr:AnOlbr2000@cluster0.js8l9.mongodb.net/NewWaveDB"
+    : "mongodb://localhost:27017/NewWaveDB";
+
+mongoose.connect(dbURI, {
   useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
+
 const db = mongoose.connection;
 
 db.once('open', () => {
@@ -47,3 +55,5 @@ app.get('*', (req, res) => {
 app.use((req, res) => {
   res.status(404).send('Not found...');
 });
+
+module.exports = server;
