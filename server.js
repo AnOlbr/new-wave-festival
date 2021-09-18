@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const socket = require('socket.io');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 
 const path = require('path');
 const concertsRoutes = require('./routes/concerts.routes');
@@ -17,7 +18,7 @@ const io = socket(server, { cors: true });
 
 const dbURI =
   process.env.NODE_ENV === "production"
-    ? "mongodb+srv://AnOlbr:AnOlbr2000@cluster0.js8l9.mongodb.net/NewWaveDB"
+    ? 'mongodb+srv://${process.env.GITHUB_USERNAME}:${process.env.OTHER_VAR}@cluster0.js8l9.mongodb.net/NewWaveDB'
     : "mongodb://localhost:27017/NewWaveDB";
 
 mongoose.connect(dbURI, {
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
 app.use(express.static(path.join(__dirname, '/client/build')));
 app.use('/api', concertsRoutes);
 app.use('/api', seatsRoutes);
